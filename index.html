@@ -360,7 +360,7 @@
         <a href="#" class="text-link" data-i18n="reel_more">LIHAT LEBIH BANYAK</a>
       </div>
     </div>
-    <div class="reel-grid">
+    <div class="reel-grid" id="reelGrid">
       <div class="reel-card"></div>
       <div class="reel-card"></div>
       <div class="reel-card"></div>
@@ -578,6 +578,30 @@
     document.querySelectorAll('[data-lang-btn]').forEach(el=> el.classList.toggle('active', el.getAttribute('data-lang-btn') === lang));
   }
   document.getElementById('langToggle').addEventListener('click', ()=> applyLang(currentLang === 'id' ? 'en' : 'id'));
+
+  // ---------- Load "Produksi Terbaru" images from CMS-managed content/productions.json ----------
+  // If the file doesn't exist yet, or has no items, or an image fails to load,
+  // the grid quietly stays as the default gradient placeholder cards — no broken UI.
+  fetch('content/productions.json')
+    .then(res => { if(!res.ok) throw new Error('productions.json not available yet'); return res.json(); })
+    .then(data => {
+      const items = (data && Array.isArray(data.items)) ? data.items : [];
+      if (items.length === 0) return;
+      const grid = document.getElementById('reelGrid');
+      if (!grid) return;
+      const cards = grid.querySelectorAll('.reel-card');
+      items.slice(0, cards.length).forEach((item, i) => {
+        if (!item || !item.image) return;
+        const img = document.createElement('img');
+        img.src = item.image;
+        img.alt = item.title || '';
+        img.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover;';
+        img.onerror = () => img.remove(); // broken/missing image -> silently fall back to gradient card
+        cards[i].appendChild(img);
+      });
+    })
+    .catch(() => { /* no content file yet — keep default placeholder grid, this is expected pre-CMS-setup */ });
+
 </script>
 
 </body>
