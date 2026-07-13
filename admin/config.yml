@@ -1,0 +1,22 @@
+backend:
+  name: git-gateway
+  branch: main
+
+media_folder: "images/uploads"
+public_folder: "images/uploads"
+
+collections:
+  - name: "productions"
+    label: "Produksi Terbaru"
+    files:
+      - name: "productions"
+        label: "Galeri Produksi Terbaru"
+        file: "content/productions.json"
+        fields:
+          - label: "Daftar Produksi"
+            name: "items"
+            widget: "list"
+            summary: "{{title}}"
+            fields:
+              - {label: "Gambar", name: "image", widget: "image"}
+              - {label: "Judul (opsional)", name: "title", widget: "string", required: false}
